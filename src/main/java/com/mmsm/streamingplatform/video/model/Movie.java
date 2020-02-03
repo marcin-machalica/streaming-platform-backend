@@ -3,6 +3,8 @@ package com.mmsm.streamingplatform.video.model;
 import lombok.Data;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Data
@@ -10,7 +12,9 @@ import javax.persistence.Id;
 public class Movie {
 
     @Id
-    private  Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private String path;
 
 }

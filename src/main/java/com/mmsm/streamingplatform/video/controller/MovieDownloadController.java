@@ -3,7 +3,6 @@ package com.mmsm.streamingplatform.video.controller;
 import com.mmsm.streamingplatform.video.model.Movie;
 import com.mmsm.streamingplatform.video.service.MovieRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -25,12 +25,12 @@ public class MovieDownloadController {
     private final MovieRepository movieRepository;
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<InputStreamResource> getMeasurement(@PathVariable("id") Long id) throws FileNotFoundException {
+    public ResponseEntity<InputStreamResource> getVideo(@PathVariable("id") Long id) throws FileNotFoundException {
         Optional<Movie> movie = movieRepository.findById(id);
-        if (!movie.isPresent()) {
+        if (movie.isPresent()) {
             return null;
         }
-        
+
         File file = new File(movie.get().getPath());
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
@@ -39,4 +39,12 @@ public class MovieDownloadController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
     }
+
+
+    @GetMapping("/download/viewAll")
+    public List<Movie> getAllVideos() throws FileNotFoundException {
+        return movieRepository.findAll();
+    }
+
+
 }
