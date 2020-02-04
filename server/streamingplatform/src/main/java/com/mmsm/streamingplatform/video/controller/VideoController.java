@@ -27,7 +27,7 @@ public class VideoController {
 
     @GetMapping("/videos")
     public List<VideoDto> getAllVideos() {
-        return videoService.getAllMovieDtos();
+        return videoService.getAllVideoDtos();
     }
 
     @GetMapping("/download/{id}")
