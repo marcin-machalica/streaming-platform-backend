@@ -20,6 +20,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatTreeModule} from '@angular/material/tree';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { RegisterUserComponent } from './components/register-user/register-user.component';
+import {KeycloakAuthGuardService} from "./services/keycloak/keycloak-auth-guard.service";
 
 @NgModule({
   declarations: [
@@ -27,7 +29,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     HomeComponent,
     VideosListComponent,
     VideoDetailsComponent,
-    VideoUploadComponent
+    VideoUploadComponent,
+    RegisterUserComponent,
   ],
   imports: [
     BrowserModule,
@@ -54,7 +57,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
       useFactory: initializer,
       multi: true,
       deps: [KeycloakService]
-    }
+    },
+    KeycloakAuthGuardService
   ],
   bootstrap: [AppComponent]
 })

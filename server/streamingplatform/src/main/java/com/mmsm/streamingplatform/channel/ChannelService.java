@@ -46,8 +46,8 @@ public class ChannelService {
         return channel.toChannelAbout(keycloakService.getUserDtoById(channel.getCreatedById()));
     }
 
-    public ChannelAbout createChannel(ChannelUpdate channelUpdate) {
-        Channel channel = Channel.of(channelUpdate.getName(), channelUpdate.getDescription());
+    public ChannelAbout createChannel(ChannelUpdate channelUpdate, String userId) {
+        Channel channel = Channel.of(userId, channelUpdate.getName(), channelUpdate.getDescription());
         channel = channelRepository.save(channel);
         UserDto author = keycloakService.getUserDtoById(channel.getCreatedById());
         return channel.toChannelAbout(author);

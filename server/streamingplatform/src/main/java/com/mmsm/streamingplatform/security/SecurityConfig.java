@@ -38,10 +38,11 @@ class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/admin/*").hasRole("admin")
-                .anyRequest().authenticated()
-                .and().addFilterAfter(corsFilter(), CorsFilter.class);
+            .authorizeRequests()
+            .antMatchers("/admin/*").hasRole("admin")
+            .antMatchers("/users/create").anonymous()
+            .anyRequest().authenticated()
+            .and().addFilterAfter(corsFilter(), CorsFilter.class);
     }
 
     @Bean

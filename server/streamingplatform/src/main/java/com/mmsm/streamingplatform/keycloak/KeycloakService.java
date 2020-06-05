@@ -1,12 +1,17 @@
 package com.mmsm.streamingplatform.keycloak;
 
-import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +31,7 @@ public class KeycloakService {
                     @Value("${keycloak.realm}") String realm,
                     @Value("${keycloak-api-username}") String username,
                     @Value("${keycloak-api-password}") String password,
-                    @Value("${keycloak-api-client}") String clientId
-                    ) {
+                    @Value("${keycloak-api-client}") String clientId) {
         this.keycloak = Keycloak.getInstance(serverUrl, realm, username, password, clientId);
         this.realmResource = keycloak.realm(realm);
     }
@@ -55,5 +59,20 @@ public class KeycloakService {
     private boolean isAdmin(UserRepresentation userRepresentation) {
         return realmResource.groups().group(ADMIN_GROUP_ID).members().stream()
                 .anyMatch(member -> member.getId().equals(userRepresentation.getId()));
+    }
+
+    UserRepresentation createUser(UserCreate userCreate) {
+        UserRepresentation user = userCreate.toUserRepresentation();
+        user.setEnabled(true);
+
+        UsersResource usersResource = realmResource.users();
+        Response response = usersResource.create(user);
+        String userId = CreatedResponseUtil.getCreatedId(response);
+
+        CredentialRepresentation credentialRepresentation = userCreate.toCredentialRepresentation();
+        UserResource userResource = usersResource.get(userId);
+        userResource.resetPassword(credentialRepresentation);
+
+        return userResource.toRepresentation();
     }
 }

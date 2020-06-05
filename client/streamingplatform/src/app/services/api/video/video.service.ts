@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 import {VideoDetails, VideoRepresentation} from './VideoDto';
 
 type VideoDetailsResponseType = HttpResponse<VideoDetails>;
-type VideoDetailsArrayResponseType = HttpResponse<VideoRepresentation[]>;
+type VideoRepresentationArrayResponseType = HttpResponse<VideoRepresentation[]>;
 type VideoRepresentationResponseType = HttpResponse<VideoRepresentation>;
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +15,7 @@ export class VideoService {
 
   constructor(private http: HttpClient) { }
 
-  findAllVideos(): Observable<VideoDetailsArrayResponseType> {
+  findAllVideos(): Observable<VideoRepresentationArrayResponseType> {
     return this.http.get<VideoRepresentation[]>(this.resourceUrl, { observe: 'response' });
   }
 

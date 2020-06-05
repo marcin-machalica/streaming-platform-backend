@@ -12,8 +12,7 @@ type UserDtoResponseType = HttpResponse<UserDto>;
 })
 export class KeycloakAdminApiService {
 
-  resourceUrl = environment.serverUrl + 'api/v1/keycloak';
-  usersResourceUrl = this.resourceUrl + '/users';
+  usersResourceUrl = environment.serverUrl + 'api/v1/users';
 
   constructor(private http: HttpClient) { }
 

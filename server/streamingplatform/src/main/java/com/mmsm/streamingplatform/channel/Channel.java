@@ -31,6 +31,10 @@ public class Channel {
     private Long id;
 
     @NotNull
+    @Column(name = "author_id", nullable = false, unique = true)
+    private String authorId;
+
+    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "name", nullable = false, unique = true)
     private String name;
@@ -50,8 +54,8 @@ public class Channel {
     @Embedded
     private Auditor auditor;
 
-    public static Channel of(String name, String description) {
-        return new Channel(null, name, description, 0L, new ArrayList<>(), Auditor.of());
+    public static Channel of(String authorId, String name, String description) {
+        return new Channel(null, authorId, name, description, 0L, new ArrayList<>(), Auditor.of());
     }
 
     public ChannelAbout toChannelAbout(UserDto author) {

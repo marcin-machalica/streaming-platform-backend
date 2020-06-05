@@ -29,4 +29,41 @@ export class KeycloakAuthGuardService extends KeycloakAuthGuard implements CanAc
       }
     });
   }
+
+  // canActivate(): Promise<boolean> {
+  //   return new Promise((resolve, reject) => {
+  //     this.keycloakAngular.isLoggedIn().then(isLoggedIn => {
+  //       console.log('isLoggedIn: ' + isLoggedIn)
+  //       if (!isLoggedIn) {
+  //         this.keycloakAngular.login()
+  //           .catch(e => console.error(e));
+  //         return false;
+  //       }
+  //       return true;
+  //     });
+  //   });
+  // }
 }
+
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class KeycloakAuthGuardService implements CanActivate {
+//
+//   constructor(protected keycloakAngular: KeycloakService) {
+//   }
+//
+//   canActivate(): Promise<boolean> {
+//     return new Promise((resolve, reject) => {
+//       this.keycloakAngular.isLoggedIn().then(isLoggedIn => {
+//         console.log('isLoggedIn: ' + isLoggedIn)
+//         if (!isLoggedIn) {
+//           this.keycloakAngular.login()
+//             .catch(e => console.error(e));
+//           return false;
+//         }
+//       });
+//     });
+//   }
+// }
