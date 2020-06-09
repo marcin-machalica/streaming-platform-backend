@@ -1,7 +1,0 @@
-<div class="page-content">
-  <h1>Videos List</h1>
-  <div *ngFor="let video of videos" routerLink="{{'/videos/' + video.id}}" class="margin-top-30 cursor-pointer">
-    <h4>{{video.title}}</h4>
-    <p>{{video.channelIdentity.name}} {{video.createdDate}}</p>
-  </div>
-</div>
