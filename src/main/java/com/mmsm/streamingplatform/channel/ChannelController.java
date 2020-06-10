@@ -5,6 +5,7 @@ import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 public class ChannelController {
@@ -79,17 +81,21 @@ public class ChannelController {
     @GetMapping("/current-channel")
     public ChannelIdentity getChannelIdentity(HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("GET CURRENT CHANNEL IDENTITY [userId = {}]", userId);
         return channelService.getChannelIdentity(userId);
     }
 
     @GetMapping("/channels/{channelName}/videos")
-    public List<VideoRepresentation> getAllVideos(@PathVariable String channelName) {
+    public List<VideoRepresentation> getAllVideos(@PathVariable String channelName, HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("GET ALL CHANNEL VIDEOS [userId = {}, channelName = {}]", userId, channelName);
         return channelService.getAllVideos(channelName);
     }
 
     @GetMapping("/channels/{channelName}")
     public ChannelAbout getChannelAbout(@PathVariable String channelName, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("GET CHANNEL ABOUT [userId = {}, channelName = {}]", userId, channelName);
         return channelService.getChannelAbout(channelName, userId);
     }
 
@@ -97,6 +103,7 @@ public class ChannelController {
     public ResponseEntity<ChannelAbout> createChannel(@RequestBody ChannelUpdate channelUpdate,
                                                       HttpServletRequest request) throws URISyntaxException {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("CREATE CHANNEL [userId = {}, channelName = {}]", userId, channelUpdate.getName());
         ChannelAbout channelAbout = channelService.createChannel(channelUpdate, userId);
         URI uri = new URI("/api/v1/videos/" + channelAbout.getName());
         return ControllerUtils.getCreatedResponse(channelAbout, uri);
@@ -106,12 +113,14 @@ public class ChannelController {
     public ChannelAbout updateChannel(@RequestBody ChannelUpdate channelUpdate, @PathVariable String channelName,
                                       HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("UPDATE CHANNEL [userId = {}, channelName = {}, channelUpdateName = {}]", userId, channelName, channelUpdate.getName());
         return channelService.updateChannel(channelUpdate, channelName, userId);
     }
 
     @DeleteMapping("/channels/{channelName}")
     public void deleteChannelByName(@PathVariable String channelName, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("DELETE CHANNEL [userId = {}, channelName = {}]", userId, channelName);
         channelService.deleteChannelByName(channelName, userId);
     }
 }

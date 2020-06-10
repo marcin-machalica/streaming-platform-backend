@@ -9,6 +9,7 @@ import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/videos/{videoId}/comments")
@@ -84,6 +86,7 @@ public class CommentController {
     @GetMapping("/{commentId}")
     CommentRepresentation getCommentDtoWithReplies(@PathVariable Long videoId, @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("GET COMMENT DTO WITH REPLIES [userId = {}, videoId = {}, commentId = {}]", userId, videoId, commentId);
         return commentService.getCommentDtoWithReplies(commentId, userId);
     }
 
@@ -91,6 +94,8 @@ public class CommentController {
     ResponseEntity<CommentRepresentation> saveComment(@RequestBody SaveComment saveComment, @PathVariable Long videoId,
                                                       HttpServletRequest request) throws URISyntaxException {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("SAVE COMMENT [userId = {}, videoId = {}, parentId = {}]", userId, videoId, saveComment.getParentId());
+
         CommentRepresentation savedComment = commentService.saveComment(saveComment, videoId, userId);
         URI uri = savedComment != null ? new URI("/api/v1/videos/" + videoId + "/comments/" + savedComment.getId()) : null;
         return ControllerUtils.getCreatedResponse(savedComment, uri);
@@ -100,12 +105,14 @@ public class CommentController {
     CommentRepresentation updateComment(@RequestBody CommentUpdate commentUpdate, @PathVariable Long videoId,
                                         @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("UPDATE COMMENT [userId = {}, videoId = {}, commentId = {}]", userId, videoId, commentId);
         return commentService.updateComment(commentUpdate, commentId, userId);
     }
 
     @DeleteMapping("/{commentId}")
     void deleteComment(@PathVariable Long videoId, @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("DELETE COMMENT [userId = {}, videoId = {}, commentId = {}]", userId, videoId, commentId);
         commentService.deleteCommentById(videoId, commentId, userId);
     }
 }

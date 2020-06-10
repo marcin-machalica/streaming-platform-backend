@@ -8,6 +8,7 @@ import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,8 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 
+
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/videos")
@@ -89,21 +92,25 @@ public class VideoController {
     private final VideoService videoService;
 
     @GetMapping
-    public List<VideoRepresentation> getAllVideos() {
+    public List<VideoRepresentation> getAllVideos(HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("GET ALL VIDEOS [userId = {}]", userId);
         return videoService.getAllVideos();
     }
 
     @GetMapping("/{videoId}")
     public VideoDetails getVideoDetails(@PathVariable Long videoId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("GET VIDEO DETAILS [userId = {}, videoId = {}]", userId, videoId);
         return videoService.getVideoDetails(videoId, userId);
     }
 
     @PostMapping
     public ResponseEntity<VideoRepresentation> createVideo(@RequestParam MultipartFile file, @RequestParam String title,
-                                                           @RequestParam String description, HttpServletRequest request)
-                                                             throws URISyntaxException, IOException, NotSupportedException {
+            @RequestParam String description, HttpServletRequest request) throws URISyntaxException, IOException, NotSupportedException {
+
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("CREATE VIDEO [userId = {}, title = {}]", userId, title);
         VideoRepresentation videoRepresentation = videoService.createVideo(file, title, description, userId);
         URI uri = new URI("/api/v1/videos/" + videoRepresentation.getId());
         return ControllerUtils.getCreatedResponse(videoRepresentation, uri);
@@ -112,17 +119,24 @@ public class VideoController {
     @PutMapping("/{videoId}")
     public VideoRepresentation updateVideo(@RequestBody VideoUpdate videoUpdate, @PathVariable Long videoId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("UPDATE VIDEO [userId = {}, videoId = {}]", userId, videoId);
         return videoService.updateVideo(videoUpdate, videoId, userId);
     }
 
     @DeleteMapping("/{videoId}")
     public void deleteVideoById(@PathVariable Long videoId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("DELETE VIDEO [userId = {}, videoId = {}]", userId, videoId);
         videoService.deleteVideoById(videoId, userId);
     }
 
     @GetMapping("/{videoId}/download")
-    public ResponseEntity<InputStreamResource> downloadVideoById(@PathVariable Long videoId) throws FileNotFoundException {
+    public ResponseEntity<InputStreamResource> downloadVideoById(@PathVariable Long videoId,
+            HttpServletRequest request) throws FileNotFoundException {
+
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("DOWNLOAD VIDEO [userId = {}, videoId = {}]", userId, videoId);
+
         Pair<File, String> fileAndFilename = videoService.getFileAndFilenameWithExtension(videoId);
         File file = fileAndFilename.getFirst();
         String filename = fileAndFilename.getSecond();
