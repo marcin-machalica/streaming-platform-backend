@@ -84,6 +84,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+
+		<finalName>streaming_platform_backend</finalName>
 	</build>
 
 </project>
