@@ -95,6 +95,13 @@ public class VideoService {
     }
 
     @Transactional
+    public void upViewCount(Long videoId) {
+        videoRepository.findById(videoId)
+            .orElseThrow(() -> new VideoNotFoundException(videoId))
+            .upViewCount();
+    }
+
+    @Transactional
     public void deleteVideoById(Long videoId, String userId) {
         Video video = videoRepository.findById(videoId).orElseThrow(() -> new VideoNotFoundException(videoId));
 

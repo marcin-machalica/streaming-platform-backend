@@ -97,6 +97,10 @@ public class Video {
         return this;
     }
 
+    void upViewCount() {
+        this.viewCount++;
+    }
+
     public Video upVote(VideoRating videoRating) {
         Boolean wasUpVote = videoRating.getIsUpVote();
         Boolean wasDownVote = videoRating.getIsDownVote();

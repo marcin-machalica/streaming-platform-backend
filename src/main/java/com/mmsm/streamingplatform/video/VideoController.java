@@ -123,6 +123,13 @@ public class VideoController {
         return videoService.updateVideo(videoUpdate, videoId, userId);
     }
 
+    @PutMapping("/{videoId}/up-view-count")
+    public void upViewCount(@PathVariable Long videoId, HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("UP VIEW COUNT [userId = {}, videoId = {}]", userId, videoId);
+        videoService.upViewCount(videoId);
+    }
+
     @DeleteMapping("/{videoId}")
     public void deleteVideoById(@PathVariable Long videoId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
