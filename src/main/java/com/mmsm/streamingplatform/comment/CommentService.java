@@ -14,10 +14,12 @@ import com.mmsm.streamingplatform.video.Video;
 import com.mmsm.streamingplatform.video.VideoController.VideoNotFoundException;
 import com.mmsm.streamingplatform.video.VideoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CommentService {
@@ -97,7 +99,13 @@ public class CommentService {
             throw new NotSufficientPermissionsException();
         }
 
-        comment = comment.setDeleted();
-        commentRepository.save(comment);
+        if (comment.getDirectRepliesCount() == 0) {
+            log.info("DELETING COMMENT [commentId = {}]", commentId);
+            commentRepository.delete(comment);
+        } else {
+            log.info("SETTING DELETED COMMENT [commentId = {}]", commentId);
+            comment = comment.setDeleted();
+            commentRepository.save(comment);
+        }
     }
 }
