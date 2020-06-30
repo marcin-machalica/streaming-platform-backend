@@ -30,6 +30,12 @@ import java.util.List;
 @Table(name = "video")
 public class Video {
 
+    public enum VideoVisibility {
+        PUBLIC,
+        LINK_ONLY,
+        PRIVATE
+    }
+
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="id_sequence")
     private Long id;
@@ -49,7 +55,7 @@ public class Video {
 
     @NotNull
     @Column(name = "view_count", nullable = false)
-    private Long viewCount = 0L;    // todo
+    private Long viewCount = 0L;
 
     @NotNull
     @Column(name = "share_count", nullable = false)
@@ -62,6 +68,11 @@ public class Video {
     @NotNull
     @Column(name = "down_vote_count", nullable = false)
     private Long downVoteCount = 0L;
+
+    @NotNull
+    @Column(name = "visibility", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private VideoVisibility visibility;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "video_id")
@@ -77,9 +88,10 @@ public class Video {
     @Embedded
     private Auditor auditor;
 
-    public static Video of(String filename, String title, String description, Channel channel) {
+    public static Video of(String filename, String title, String description, VideoVisibility visibility, Channel channel) {
         return new Video(null, filename, title, description, 0L, 0L,
-            0L, 0L, new ArrayList<>(), new ArrayList<>(), channel, Auditor.of());
+            0L, 0L, visibility, new ArrayList<>(), new ArrayList<>(),
+            channel, Auditor.of());
     }
 
     public VideoRepresentation toRepresentation() {

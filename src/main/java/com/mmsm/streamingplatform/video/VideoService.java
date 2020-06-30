@@ -4,6 +4,7 @@ import com.mmsm.streamingplatform.channel.Channel;
 import com.mmsm.streamingplatform.channel.ChannelController.ChannelNotFoundByUserIdException;
 import com.mmsm.streamingplatform.channel.ChannelRepository;
 import com.mmsm.streamingplatform.utils.CommonExceptionsUtils.CanOnlyBePerformedByAuthorException;
+import com.mmsm.streamingplatform.video.Video.VideoVisibility;
 import com.mmsm.streamingplatform.video.VideoController.*;
 import com.mmsm.streamingplatform.comment.CommentController.*;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
@@ -44,9 +45,9 @@ public class VideoService {
     @Value("${VIDEOS_STORAGE_PATH}")
     public String VIDEOS_STORAGE_PATH;
 
-    public List<VideoRepresentation> getAllVideos() {
-        return videoRepository.findAll()
-            .stream()
+    public List<VideoRepresentation> getAllVideos(String userId) {
+        return videoRepository.findAll().stream()
+            .filter(video -> video.getVisibility().equals(VideoVisibility.PUBLIC) || video.getCreatedById().equals(userId))
             .map(Video::toRepresentation)
             .collect(Collectors.toList());
     }
@@ -70,11 +71,11 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoRepresentation createVideo(MultipartFile file, String title, String description, String userId) throws NotSupportedException, IOException {
+    public VideoRepresentation createVideo(MultipartFile file, String title, String description, VideoVisibility visibility, String userId) throws NotSupportedException, IOException {
         Channel channel = channelRepository.findByAuditorCreatedById(userId).orElseThrow(() -> new ChannelNotFoundByUserIdException(userId));
 
         String filename = generateFilename(file.getOriginalFilename());
-        Video video = Video.of(filename, title, description, channel);
+        Video video = Video.of(filename, title, description, visibility, channel);
 
         video = videoRepository.save(video);
         storeFile(file, filename);
@@ -116,6 +117,12 @@ public class VideoService {
             throw new CannotDeleteFileException();
         }
         videoRepository.delete(video);
+    }
+
+    Boolean canAccessVideo(Long videoId, String userId) {
+        return videoRepository.findById(videoId)
+            .map(video -> !video.getVisibility().equals(VideoVisibility.PRIVATE) || video.getCreatedById().equals(userId))
+            .orElse(false);
     }
 
     public Pair<File, String> getFileAndFilenameWithExtension(Long videoId) {

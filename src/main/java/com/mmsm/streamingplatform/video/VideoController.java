@@ -4,6 +4,7 @@ import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.CommentController;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
+import com.mmsm.streamingplatform.video.Video.VideoVisibility;
 import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -95,7 +96,7 @@ public class VideoController {
     public List<VideoRepresentation> getAllVideos(HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         log.info("GET ALL VIDEOS [userId = {}]", userId);
-        return videoService.getAllVideos();
+        return videoService.getAllVideos(userId);
     }
 
     @GetMapping("/{videoId}")
@@ -107,11 +108,12 @@ public class VideoController {
 
     @PostMapping
     public ResponseEntity<VideoRepresentation> createVideo(@RequestParam MultipartFile file, @RequestParam String title,
-            @RequestParam String description, HttpServletRequest request) throws URISyntaxException, IOException, NotSupportedException {
+                @RequestParam String description, @RequestParam VideoVisibility visibility, HttpServletRequest request)
+                    throws URISyntaxException, IOException, NotSupportedException {
 
         String userId = SecurityUtils.getUserIdFromRequest(request);
-        log.info("CREATE VIDEO [userId = {}, title = {}]", userId, title);
-        VideoRepresentation videoRepresentation = videoService.createVideo(file, title, description, userId);
+        log.info("CREATE VIDEO [userId = {}, title = {}, visibility = {}]", userId, title, visibility);
+        VideoRepresentation videoRepresentation = videoService.createVideo(file, title, description, visibility, userId);
         URI uri = new URI("/api/v1/videos/" + videoRepresentation.getId());
         return ControllerUtils.getCreatedResponse(videoRepresentation, uri);
     }
