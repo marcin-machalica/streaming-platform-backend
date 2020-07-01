@@ -6,11 +6,13 @@ import com.mmsm.streamingplatform.video.Video;
 import com.mmsm.streamingplatform.video.VideoController.*;
 import com.mmsm.streamingplatform.channel.ChannelController.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,6 +76,22 @@ public class ChannelService {
         channel.updateChannel(channelUpdate);
         channel = channelRepository.save(channel);
         return channel.toChannelAbout(userId);
+    }
+
+    void updateAvatar(String channelName, MultipartFile file) throws IOException {
+        Channel channel = channelRepository.findByName(channelName).orElseThrow(() -> new ChannelNotFoundByNameException(channelName));
+
+        try (InputStream inputStream = file.getInputStream()) {
+            channel.setAvatar(IOUtils.toByteArray(inputStream));
+        }
+
+        channelRepository.save(channel);
+    }
+
+    byte[] getAvatar(String channelName) {
+        return channelRepository.findByName(channelName)
+            .orElseThrow(() -> new ChannelNotFoundByNameException(channelName))
+            .getAvatar();
     }
 
     @Transactional

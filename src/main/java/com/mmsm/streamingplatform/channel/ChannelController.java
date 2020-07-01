@@ -2,16 +2,21 @@ package com.mmsm.streamingplatform.channel;
 
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
+import com.mmsm.streamingplatform.video.Video;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.mmsm.streamingplatform.video.VideoController.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.NotSupportedException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -115,6 +120,21 @@ public class ChannelController {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         log.info("UPDATE CHANNEL [userId = {}, channelName = {}, channelUpdateName = {}]", userId, channelName, channelUpdate.getName());
         return channelService.updateChannel(channelUpdate, channelName, userId);
+    }
+
+    @PostMapping("/channels/{channelName}/avatar")
+    public void updateAvatar(@RequestParam MultipartFile file, @PathVariable String channelName,
+                             HttpServletRequest request) throws IOException {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("UPDATE AVATAR [userId = {}, channelName = {}]", userId, channelName);
+        channelService.updateAvatar(channelName, file);
+    }
+
+    @GetMapping(value = "/channels/{channelName}/avatar", produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getAvatar(@PathVariable String channelName, HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        log.info("GET AVATAR [userId = {}, channelName = {}]", userId, channelName);
+        return channelService.getAvatar(channelName);
     }
 
     @DeleteMapping("/channels/{channelName}")

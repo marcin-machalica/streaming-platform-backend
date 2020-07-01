@@ -43,6 +43,10 @@ public class Channel {
     @Column(name = "subscription_count", nullable = false)
     private Long subscriptionCount = 0L;        // todo
 
+    @Lob
+    @Column(name = "avatar", columnDefinition="BLOB")
+    private byte[] avatar;
+
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Video> videos = new ArrayList<>();
 
@@ -50,7 +54,7 @@ public class Channel {
     private Auditor auditor;
 
     public static Channel of(String name, String description) {
-        return new Channel(null, name, description, 0L, new ArrayList<>(), Auditor.of());
+        return new Channel(null, name, description, 0L, null, new ArrayList<>(), Auditor.of());
     }
 
     public ChannelAbout toChannelAbout(String userId) {
